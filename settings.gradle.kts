@@ -43,5 +43,6 @@ include(
     ":kmath-tensors",
     ":kmath-jupyter",
     ":examples",
+    ":kmath-ojalgo",
     ":benchmarks"
 )
