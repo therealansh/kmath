@@ -42,6 +42,7 @@ include(
     ":kmath-kotlingrad",
     ":kmath-tensors",
     ":kmath-jupyter",
+    ":kmath-units",
     ":examples",
     ":benchmarks"
 )
