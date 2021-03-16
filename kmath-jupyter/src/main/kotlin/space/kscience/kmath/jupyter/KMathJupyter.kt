@@ -121,19 +121,20 @@ internal class KMathJupyter : JupyterIntegration() {
             })
         }
 
-        render<Complex> {
+        render<Complex<*>> {
             MstRing {
+                if (it.re is Number && it.im is Number)
                 number(it.re) + number(it.im) * bindSymbol("i")
             }.toDisplayResult()
         }
 
-        render<Quaternion> {
-            MstRing {
-                number(it.w) +
-                        number(it.x) * bindSymbol("i") +
-                        number(it.x) * bindSymbol("j") +
-                        number(it.x) * bindSymbol("k")
-            }.toDisplayResult()
-        }
+//        render<Quaternion> {
+//            MstRing {
+//                number(it.w) +
+//                        number(it.x) * bindSymbol("i") +
+//                        number(it.y) * bindSymbol("j") +
+//                        number(it.z) * bindSymbol("k")
+//            }.toDisplayResult()
+//        }
     }
 }

@@ -227,7 +227,7 @@ public interface RingND<T, out R : Ring<T>> : Ring<StructureND<T>>, GroupND<T, R
  * Field of [StructureND].
  *
  * @param T the type of the element contained in ND structure.
- * @param F the type field of structure elements.
+ * @param F the type of field of structure elements.
  */
 public interface FieldND<T, out F : Field<T>> : Field<StructureND<T>>, RingND<T, F>, ScaleOperations<StructureND<T>> {
     /**
@@ -289,3 +289,11 @@ public interface FieldND<T, out F : Field<T>> : Field<StructureND<T>>, RingND<T,
 //            }
 //    }
 }
+
+/**
+ * Extended field of [StructureND].
+ *
+ * @param T the type of the element contained in ND structure.
+ * @param F the type of extended field of structure elements.
+ */
+public interface ExtendedFieldND<T, out F : ExtendedField<T>> : ExtendedField<StructureND<T>>, FieldND<T, F>
