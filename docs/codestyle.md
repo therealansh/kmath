@@ -1,7 +1,6 @@
 # Coding Conventions
 
-KMath code follows general [Kotlin conventions](https://kotlinlang.org/docs/reference/coding-conventions.html), but 
-with a number of small changes and clarifications.
+Generally, KMath code follows general [Kotlin coding conventions](https://kotlinlang.org/docs/reference/coding-conventions.html), but with a number of small changes and clarifications.
 
 ## Utility Class Naming
 
