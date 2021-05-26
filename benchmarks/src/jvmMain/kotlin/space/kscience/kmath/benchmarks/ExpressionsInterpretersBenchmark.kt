@@ -14,6 +14,7 @@ import space.kscience.kmath.expressions.*
 import space.kscience.kmath.operations.DoubleField
 import space.kscience.kmath.operations.bindSymbol
 import space.kscience.kmath.operations.invoke
+import kotlin.math.sin
 import kotlin.random.Random
 
 @State(Scope.Benchmark)
@@ -30,6 +31,19 @@ internal class ExpressionsInterpretersBenchmark {
     @Benchmark
     fun rawExpression(blackhole: Blackhole) = invokeAndSum(raw, blackhole)
 
+    @Benchmark
+    fun justCalculate(blackhole: Blackhole) {
+        val random = Random(0)
+        var sum = 0.0
+
+        repeat(times) {
+            val x = random.nextDouble()
+            sum += x * 2.0 + 2.0 / x - 16.0 / sin(x)
+        }
+
+        blackhole.consume(sum)
+    }
+
     private fun invokeAndSum(expr: Expression<Double>, blackhole: Blackhole) {
         val random = Random(0)
         var sum = 0.0
@@ -42,23 +56,24 @@ internal class ExpressionsInterpretersBenchmark {
     }
 
     private companion object {
-        private val x: Symbol by symbol
-        private val algebra: DoubleField = DoubleField
+        private val x by symbol
+        private val algebra = DoubleField
         private const val times = 1_000_000
 
-        private val functional: Expression<Double> = DoubleField.expressionInExtendedField {
+        private val functional = DoubleField.expressionInExtendedField {
             bindSymbol(x) * number(2.0) + number(2.0) / bindSymbol(x) - number(16.0) / sin(bindSymbol(x))
         }
 
         private val node = MstExtendedField {
-            bindSymbol(x) * 2.0 + number(2.0) / bindSymbol(x) - number(16.0) / sin(bindSymbol(x))
+            x * 2.0 + number(2.0) / x - number(16.0) / sin(x)
         }
 
-        private val mst: Expression<Double> = node.toExpression(DoubleField)
-        private val asm: Expression<Double> = node.compileToExpression(DoubleField)
+        private val mst = node.toExpression(DoubleField)
+        private val asm = node.compileToExpression(DoubleField)
 
-        private val raw: Expression<Double> = Expression { args ->
-            args.getValue(x) * 2.0 + 2.0 / args.getValue(x) - 16.0 / kotlin.math.sin(args.getValue(x))
+        private val raw = Expression<Double> { args ->
+            val x = args[x]!!
+            x * 2.0 + 2.0 / x - 16.0 / sin(x)
         }
     }
 }

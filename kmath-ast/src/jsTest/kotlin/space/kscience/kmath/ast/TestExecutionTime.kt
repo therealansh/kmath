@@ -7,7 +7,6 @@ package space.kscience.kmath.ast
 
 import space.kscience.kmath.expressions.*
 import space.kscience.kmath.operations.DoubleField
-import space.kscience.kmath.operations.ExtendedField
 import space.kscience.kmath.operations.bindSymbol
 import space.kscience.kmath.operations.invoke
 import kotlin.math.sin
@@ -21,14 +20,14 @@ internal class TestExecutionTime {
     private companion object {
         private const val times = 1_000_000
         private val x by symbol
-        private val algebra: ExtendedField<Double> = DoubleField
+        private val algebra = DoubleField
 
         private val functional = DoubleField.expressionInExtendedField {
             bindSymbol(x) * const(2.0) + const(2.0) / bindSymbol(x) - const(16.0) / sin(bindSymbol(x))
         }
 
         private val node = MstExtendedField {
-            bindSymbol(x) * number(2.0) + number(2.0) / bindSymbol(x) - number(16.0) / sin(bindSymbol(x))
+            x * number(2.0) + number(2.0) / x - number(16.0) / sin(x)
         }
 
         private val mst = node.toExpression(DoubleField)
@@ -43,7 +42,13 @@ internal class TestExecutionTime {
         //  };
 
         private val raw = Expression<Double> { args ->
-            args.getValue(x) * 2.0 + 2.0 / args.getValue(x) - 16.0 / sin(args.getValue(x))
+            val x = args[x]!!
+            x * 2.0 + 2.0 / x - 16.0 / sin(x)
+        }
+
+        private val justCalculate = { args: dynamic ->
+            val x = args[x].unsafeCast<Double>()
+            x * 2.0 + 2.0 / x - 16.0 / sin(x)
         }
     }
 
@@ -51,7 +56,9 @@ internal class TestExecutionTime {
         println(name)
         val rng = Random(0)
         var sum = 0.0
-        measureTime { repeat(times) { sum += expr(x to rng.nextDouble()) } }.also(::println)
+        measureTime {
+            repeat(times) { sum += expr(x to rng.nextDouble()) }
+        }.also(::println)
     }
 
     @Test
@@ -68,4 +75,19 @@ internal class TestExecutionTime {
 
     @Test
     fun rawExpression() = invokeAndSum("raw", raw)
+
+    @Test
+    fun justCalculateExpression() {
+        println("justCalculate")
+        val rng = Random(0)
+        var sum = 0.0
+        measureTime {
+            repeat(times) {
+                val arg = rng.nextDouble()
+                val o = js("{}")
+                o["x"] = arg
+                sum += justCalculate(o)
+            }
+        }.also(::println)
+    }
 }
